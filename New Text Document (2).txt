@@ -1,0 +1,5 @@
+unity gitignore
+https://github.com/github/gitignore
+
+Unity live training
+2D Character controller
