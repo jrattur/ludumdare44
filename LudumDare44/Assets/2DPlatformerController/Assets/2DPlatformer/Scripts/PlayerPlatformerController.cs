@@ -10,6 +10,8 @@ public class PlayerPlatformerController : PhysicsObject
     [SerializeField]
     private bool touchingWallRight = false;
 
+    [SerializeField]
+    private bool monketBars = false;
 
     public float maxSpeed = 7;
     public float jumpTakeOffSpeed = 7;
@@ -31,15 +33,30 @@ public class PlayerPlatformerController : PhysicsObject
         move.x = Input.GetAxis("Horizontal");
         RaycastHit2D raycastHit2D = Physics2D.Raycast(spriteRenderer.bounds.center, Vector2.left, 0.3f, LayerMask.GetMask("Wall"));
         if (raycastHit2D.collider != null) {
-            Debug.Log("sadsag");
             touchingWallLeft = true;
             }
-        else {touchingWallLeft = false;}
-    
+        else {
+            touchingWallLeft = false;
+            raycastHit2D = Physics2D.Raycast(spriteRenderer.bounds.center, Vector2.right, 0.3f, LayerMask.GetMask("Wall"));
+            if (raycastHit2D.collider != null)
+            {
+                touchingWallRight = true;
+            }
+            else { touchingWallRight = false; }
+        }
+
+        raycastHit2D = Physics2D.Raycast(spriteRenderer.bounds.center, Vector2.up, 0.5f, LayerMask.GetMask("MonkeyBar"));
+        if (raycastHit2D.collider != null)
+        {
+            monketBars = true;
+        }
+        else { monketBars = false; }
+
 
         if (
             (touchingWallLeft && Input.GetAxis("Horizontal") < 0f) ||
-            (touchingWallRight && Input.GetAxis("Horizontal") > 0f))
+            (touchingWallRight && Input.GetAxis("Horizontal") > 0f) ||
+            (monketBars && Input.GetAxis("Vertical") > 0f))
         {
             gravityModifier = 0f;
         }
