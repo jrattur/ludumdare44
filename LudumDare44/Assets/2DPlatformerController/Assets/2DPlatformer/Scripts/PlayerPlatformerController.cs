@@ -58,7 +58,7 @@ public class PlayerPlatformerController : PhysicsObject
         monkeyBars = raycastHit2D.collider != null ? true : false;
 
         raycastHit2D = Physics2D.Raycast(spriteRenderer.bounds.center, Vector2.up, 0.01f, LayerMask.GetMask("Ladder"));
-        climbingLadder = raycastHit2D.collider != null ? true : false;
+        climbingLadder = raycastHit2D.collider != null && arms >= 1 && legs >=1 ? true : false;
 
         if (
             arms == 2 && 
@@ -97,7 +97,7 @@ public class PlayerPlatformerController : PhysicsObject
             spriteRenderer.flipX = !spriteRenderer.flipX;
         }
 
-        if (Input.GetAxis("Vertical") < 0f)
+        if (Input.GetAxis("Vertical") < 0f || legs == 0)
         {
             animator.SetBool("crouching", true);
             capsuleCollider2D.offset = new Vector2(capsuleCollider2DOriginalOffset.x, 0.3f);
