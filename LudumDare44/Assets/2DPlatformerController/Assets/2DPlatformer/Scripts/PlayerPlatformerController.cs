@@ -2,10 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerPlatformerController : PhysicsObject
 {
     public GameObject gameController;
+    public GameObject armLegsText;
 
     [SerializeField]
     public int arms = 2, legs = 2;
@@ -66,7 +68,7 @@ public class PlayerPlatformerController : PhysicsObject
             (
                 (touchingWallLeft && Input.GetAxis("Horizontal") < 0f) ||
                 (touchingWallRight && Input.GetAxis("Horizontal") > 0f) ||
-                (monkeyBars && Input.GetAxis("Vertical") > 0f)
+                (monkeyBars)
             ) ||
             climbingLadder)
         { gravityModifier = 0f; } else { gravityModifier = 1f; }
@@ -79,8 +81,8 @@ public class PlayerPlatformerController : PhysicsObject
         if (Input.GetButtonDown("Jump") && 
             legs == 2 &&
             (grounded ||
-            (touchingWallRight && Input.GetAxis("Horizontal") < 0f && arms == 2) ||
-            (touchingWallLeft && Input.GetAxis("Horizontal") > 0f && arms == 2) ||
+            (touchingWallRight && arms == 2) ||
+            (touchingWallLeft && arms == 2) ||
              climbingLadder))
         { velocity.y = jumpTakeOffSpeed; }
         else if (Input.GetButtonUp("Jump"))
@@ -136,7 +138,8 @@ public class PlayerPlatformerController : PhysicsObject
             case 1: legs--; break;
             default: break;
         }
-        Debug.Assert(arms > -1, "Something's wrong with arms");
+        armLegsText.GetComponent<Text>().text = arms + " Arms\n" + legs +  " Legs";
+        Debug.Assert(arms > -1, "Something's wrong with arms"); 
         Debug.Assert(legs > -1, "Something's wrong with legs");
         armOrLegDialogue.SetActive(false);
         Destroy(triggeredObject);
