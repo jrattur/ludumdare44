@@ -11,6 +11,7 @@ public class PlayerPlatformerController : PhysicsObject
     public int arms = 2, legs = 2;
 
     public GameObject armOrLegDialogue;
+    public GameObject armButton, legButton;
 
     [SerializeField] private float ladderMoveSpeed = 0.2f;
 
@@ -29,11 +30,17 @@ public class PlayerPlatformerController : PhysicsObject
     private SpriteRenderer spriteRenderer;
     private Animator animator;
 
+    private CapsuleCollider2D capsuleCollider2D;
+    private Vector2 capsuleCollider2DOriginalOffset, capsuleCollider2DOriginalSize;
+
     // Use this for initialization
     void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
+        capsuleCollider2D = GetComponent<CapsuleCollider2D>();
+        capsuleCollider2DOriginalOffset = capsuleCollider2D.offset;
+        capsuleCollider2DOriginalSize = capsuleCollider2D.size;
     }
 
     protected override void ComputeVelocity()
@@ -53,10 +60,15 @@ public class PlayerPlatformerController : PhysicsObject
         raycastHit2D = Physics2D.Raycast(spriteRenderer.bounds.center, Vector2.up, 0.01f, LayerMask.GetMask("Ladder"));
         climbingLadder = raycastHit2D.collider != null ? true : false;
 
-        if ((touchingWallLeft && Input.GetAxis("Horizontal") < 0f) ||
-            (touchingWallRight && Input.GetAxis("Horizontal") > 0f) ||
-            (monkeyBars && Input.GetAxis("Vertical") > 0f) ||
-            (climbingLadder))
+        if (
+            arms == 2 && 
+            legs == 2 &&
+            (
+                (touchingWallLeft && Input.GetAxis("Horizontal") < 0f) ||
+                (touchingWallRight && Input.GetAxis("Horizontal") > 0f) ||
+                (monkeyBars && Input.GetAxis("Vertical") > 0f)
+            ) ||
+            climbingLadder)
         { gravityModifier = 0f; } else { gravityModifier = 1f; }
 
         if (climbingLadder && Mathf.Abs(Input.GetAxis("Vertical")) > 0f)
@@ -65,9 +77,10 @@ public class PlayerPlatformerController : PhysicsObject
         } 
 
         if (Input.GetButtonDown("Jump") && 
+            legs == 2 &&
             (grounded ||
-            (touchingWallRight && Input.GetAxis("Horizontal") < 0f) ||
-            (touchingWallLeft && Input.GetAxis("Horizontal") > 0f) ||
+            (touchingWallRight && Input.GetAxis("Horizontal") < 0f && arms == 2) ||
+            (touchingWallLeft && Input.GetAxis("Horizontal") > 0f && arms == 2) ||
              climbingLadder))
         { velocity.y = jumpTakeOffSpeed; }
         else if (Input.GetButtonUp("Jump"))
@@ -87,8 +100,15 @@ public class PlayerPlatformerController : PhysicsObject
         if (Input.GetAxis("Vertical") < 0f)
         {
             animator.SetBool("crouching", true);
+            capsuleCollider2D.offset = new Vector2(capsuleCollider2DOriginalOffset.x, 0.3f);
+            capsuleCollider2D.size = new Vector2(capsuleCollider2DOriginalSize.x, 0.6f);
         }
-        else { animator.SetBool("crouching", false); }
+        else
+        {
+            animator.SetBool("crouching", false);
+            capsuleCollider2D.offset = capsuleCollider2DOriginalOffset;
+            capsuleCollider2D.size = capsuleCollider2DOriginalSize;
+        }
 
         animator.SetBool("grounded", grounded);
         animator.SetFloat("velocityX", Mathf.Abs(velocity.x) / maxSpeed);
@@ -103,6 +123,8 @@ public class PlayerPlatformerController : PhysicsObject
             triggeredObject = collider2D.gameObject;
             gameController.GetComponent<InGameMenu>().PauseGameToggle();
             armOrLegDialogue.SetActive(true);
+            if (arms == 0) { armButton.SetActive(false); }
+            if (legs == 0) { legButton.SetActive(false); }
         }
     }
 
