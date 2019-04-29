@@ -56,7 +56,7 @@ public class PlayerPlatformerController : PhysicsObject
         raycastHit2D = Physics2D.Raycast(spriteRenderer.bounds.center, Vector2.right, 0.3f, LayerMask.GetMask("Wall"));
         touchingWallRight = raycastHit2D.collider != null ? true : false;
 
-        raycastHit2D = Physics2D.Raycast(spriteRenderer.bounds.center, Vector2.up, 0.5f, LayerMask.GetMask("MonkeyBar"));
+        raycastHit2D = Physics2D.Raycast(spriteRenderer.bounds.center, Vector2.up, 0.75f, LayerMask.GetMask("MonkeyBar"));
         monkeyBars = raycastHit2D.collider != null ? true : false;
 
         raycastHit2D = Physics2D.Raycast(spriteRenderer.bounds.center, Vector2.up, 0.01f, LayerMask.GetMask("Ladder"));
@@ -138,7 +138,7 @@ public class PlayerPlatformerController : PhysicsObject
             case 1: legs--; break;
             default: break;
         }
-        armLegsText.GetComponent<Text>().text = arms + " Arms\n" + legs +  " Legs";
+        armLegsText.GetComponent<Text>().text = "Arms: " + arms + "\nLegs: " + legs;
         Debug.Assert(arms > -1, "Something's wrong with arms"); 
         Debug.Assert(legs > -1, "Something's wrong with legs");
         armOrLegDialogue.SetActive(false);
